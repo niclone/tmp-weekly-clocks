@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Chip from './Chip';
 import { TimeSelector } from './TimeSelector';
 
-const { ipcRenderer } = window.electron;
+const { store } = window.electron;
 
 interface WeekdayProps {
   dayname: string;
@@ -25,46 +25,47 @@ const useElectronStore = <T,>(
 ): [T, (v: T) => void] => {
   const [data, setData] = useState<T>(initialValue);
   useEffect(() => {
+    /*
     ipcRenderer.on('useElectronStore-answer', (_data: ElectronStoreMessage) => {
       if (key === _data.key) {
         const v = JSON.parse(_data.value);
         if (v !== data) setData(v);
       }
     });
+    */
 
-    const r = ipcRenderer.sendMessageSync('useElectronStore-get', key);
-    setData(r);
+    const r = store.get(key);
+    if (r === undefined) setData(initialValue);
+    else setData(JSON.parse(r));
+
     /*
     window.electron.store.get(key).then((v:T) => {
       setData(v)
-    });*/
-  }, []);
+    }); */
+  }, [key]);
 
   const setElectronValue = (value: T) => {
-    ipcRenderer.sendMessage("useElectronStore-set", { key, value: JSON.stringify(value) })
-    //window.electron.store.set(key, JSON.stringify(value))
-  }
-  return [ data, setElectronValue ]
-}
+    store.set(key, JSON.stringify(value));
+    setData(value);
+  };
+
+  return [data, setElectronValue];
+};
 
 const Weekday = (props:WeekdayProps) => {
   //const [ times, setTimes ] = useState<AlarmTime[]>([])
-  const [ lastId, setLastId ] = useState<number>(0)
-  const [ times, setTimes ] = useElectronStore<AlarmTime[]>("times", [])
+  const [ lastId, setLastId ] = useState<number>(0);
+  const [ times, setTimes ] = useElectronStore<AlarmTime[]>("times", []);
 
   const addTime = () => {
-    let id = lastId + 1
-    setLastId(id)
-    setTimes([...times, {id, t:"plop"} as AlarmTime ])
-  }
+    let id = lastId + 1;
+    setLastId(id);
+    setTimes([...times, {id, t:"plop"} as AlarmTime ]);
+  };
 
   const removeTime = (id:number) => {
     setTimes([...times.filter(o => o.id !== id)])
-  }
-
-  useEffect(() => {
-    //ipcRenderer.send('asynchronous-message', JSON.stringify(times))
-  }, [times])
+  };
 
   return (
     <div className="Weekday">
@@ -72,8 +73,8 @@ const Weekday = (props:WeekdayProps) => {
       <div className="WeekDayAlarms">
         {times.map((at:AlarmTime) =>
           <Chip
-            key={"chip-"+at.id}
-            onClose={(event) => { removeTime(at.id) }}
+            key={`chip-${at.id}`}
+            onClose={() => removeTime(at.id)}
             type="input"
             className="mr-2"
           >
@@ -83,7 +84,7 @@ const Weekday = (props:WeekdayProps) => {
         <Button onClick={() => addTime()}>+</Button>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Weekday
+export default Weekday;

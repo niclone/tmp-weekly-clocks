@@ -21,4 +21,13 @@ contextBridge.exposeInMainWorld('electron', {
       ipcRenderer.once(channel, (_event, ...args) => func(...args));
     },
   },
+  store: {
+    get(key: string) {
+      return ipcRenderer.sendSync('electron-store-get', key);
+    },
+    set(key: string, val: unknown) {
+      ipcRenderer.send('electron-store-set', key, val);
+    },
+    // Other method you want to add like has(), reset(), etc.
+  },
 });

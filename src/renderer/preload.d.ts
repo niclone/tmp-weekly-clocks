@@ -13,6 +13,10 @@ declare global {
         once(channel: string, func: (...args: unknown[]) => void): void;
       };
     };
+    store: {
+      get: (key: string) => unknown;
+      set: (key: string, val: unknown) => void;
+    };
   }
 }
 

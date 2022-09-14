@@ -12,6 +12,7 @@ import path from 'path';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
+import Store from 'electron-store';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 
@@ -142,17 +143,12 @@ app
  * Code nico
 **/
 
-const Store = require('electron-store');
-
 const store = new Store();
 
-ipcMain.on('useElectronStore-get', async (event, arg) => {
-  console.log('useElectronStore-get', arg); // prints "heyyyy ping"
-  event.returnValue = store.get(arg);
-  console.log('useElectronStore-get v:', event.returnValue);
+// IPC listener
+ipcMain.on('electron-store-get', async (event, val) => {
+  event.returnValue = store.get(val);
 });
-
-ipcMain.on('useElectronStore-set', (event, arg) => {
-  console.log('useElectronStore-set', arg);
-  store.set(arg.key, arg.value);
+ipcMain.on('electron-store-set', async (event, key, val) => {
+  store.set(key, val);
 });

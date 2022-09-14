@@ -1,5 +1,5 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
-import Week from './components/Week'
+import Week from './components/Week';
 import icon from '../../assets/icon.svg';
 import './App.css';
 
