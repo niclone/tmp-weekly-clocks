@@ -1,4 +1,5 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
+import Week from './components/Week'
 import icon from '../../assets/icon.svg';
 import './App.css';
 
@@ -43,7 +44,7 @@ export default function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Hello />} />
+        <Route path="/" element={<Week />} />
       </Routes>
     </Router>
   );
