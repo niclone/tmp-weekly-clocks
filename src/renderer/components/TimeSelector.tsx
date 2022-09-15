@@ -12,7 +12,7 @@ export default (props: TimeSelectorProps) => {
       <form>
         <input
           type="time"
-          className="form-control"
+          className=""
           id="inputTime"
           aria-describedby="Alarme time"
           placeholder="Time"

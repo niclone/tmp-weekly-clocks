@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { AiOutlineCloseSquare } from 'react-icons/ai';
 
 interface ChipsProps {
   children: ReactNode;
@@ -9,7 +10,7 @@ const Chips = (props: ChipsProps) => {
   return (
     <div className="Chips">
       {children}
-      <i className="bi bi-x-square" />
+      <AiOutlineCloseSquare />
     </div>
   );
 };
