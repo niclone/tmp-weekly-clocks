@@ -151,4 +151,5 @@ ipcMain.on('electron-store-get', async (event, val) => {
 });
 ipcMain.on('electron-store-set', async (event, key, val) => {
   store.set(key, val);
+  event.returnValue = store.get(val);
 });
