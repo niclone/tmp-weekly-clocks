@@ -1,20 +1,28 @@
-import React from 'react'
+import React from 'react';
 
 interface TimeSelectorProps {
-  onChange: object;
-  hours: number;
-  minutes: number;
-};
+  onChange: (t: string) => void;
+  timestr: string;
+}
 
-export const TimeSelector = (props:TimeSelectorProps) => {
+export default (props: TimeSelectorProps) => {
+  const { onChange, timestr } = props;
   return (
     <div className="row">
-        <form>
-            <input type="time" className="form-control" id="inputTime" aria-describedby="Alarme time" placeholder="Time"/>
-        </form>
+      <form>
+        <input
+          type="time"
+          className="form-control"
+          id="inputTime"
+          aria-describedby="Alarme time"
+          placeholder="Time"
+          onChange={(event) => { console.log("paf", event.target.value); onChange(event.target.value); }}
+          value={timestr}
+        />
+      </form>
     </div>
-  )
-}
+  );
+};
 
 /*
 export const TimeSelector = (props:TimeSelectorProps) => {

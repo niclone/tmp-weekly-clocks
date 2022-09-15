@@ -143,7 +143,7 @@ app
  * Code nico
 **/
 
-const store = new Store();
+const store = new Store({ name: 'horloge-de-classe' });
 
 // IPC listener
 ipcMain.on('electron-store-get', async (event, val) => {
