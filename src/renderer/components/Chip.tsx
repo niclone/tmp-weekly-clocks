@@ -3,14 +3,15 @@ import { AiOutlineCloseSquare } from 'react-icons/ai';
 
 interface ChipsProps {
   children: ReactNode;
+  onClose: () => void;
 }
 
 const Chips = (props: ChipsProps) => {
-  const { children } = props;
+  const { children, onClose } = props;
   return (
     <div className="Chips">
       {children}
-      <AiOutlineCloseSquare />
+      <AiOutlineCloseSquare className="ChipClose" onClick={() => onClose()} />
     </div>
   );
 };

@@ -51,5 +51,17 @@ a:hover {
 .Chips input {
   background-color: #966;
   border: none;
-  margin-right: 5px;
+}
+
+.ChipClose {
+  background-color: #966;
+  padding: 0px;
+  width: 1.5em;
+  height: 1.5em;
+  margin: 4px;
+  cursor: pointer;
+}
+
+.ChipClose:hover {
+  background-color: #b88;
 }
