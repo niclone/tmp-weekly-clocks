@@ -15,6 +15,7 @@ import log from 'electron-log';
 import Store from 'electron-store';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+import moment from 'moment';
 
 class AppUpdater {
   constructor() {
@@ -138,7 +139,6 @@ app
   })
   .catch(console.log);
 
-
 /*
  * Code nico
 **/
@@ -152,4 +152,62 @@ ipcMain.on('electron-store-get', async (event, val) => {
 ipcMain.on('electron-store-set', async (event, key, val) => {
   store.set(key, val);
   event.returnValue = store.get(val);
+  getAlarms();
 });
+
+// search next alarm
+const moment = require('moment');
+const cron = require('node-cron');
+
+interface AlarmTime {
+  id: string;
+  t: string;
+  day: number;
+}
+
+interface Croned {
+  at: AlarmTime;
+  task: object;
+}
+
+const croneds = {};
+
+const musica = () => {
+  console.log('musica !');
+};
+
+const setupAlarm = (at: AlarmTime) => {
+  const [ hour, minute ] = at.t.split(':');
+  const task = croneds[at.id];
+  if (task !== undefined) {
+    if (JSON.stringify(at) !== JSON.stringify(task.options.at)) {
+      task.stop();
+    }
+  } else {
+    croneds[at.id] = cron.schedule(`${minute} ${hour} * * ${at.day}`, () => {
+      musica();
+    }, {
+      at
+    });
+  }
+}
+
+const getAlarms = () => {
+  const now = moment();
+  for (let i = 0; i < 7; i++) {
+    const timesstr = store.get(`times-${i}`);
+    if (timesstr === undefined) continue;
+    let times = JSON.parse(timesstr);
+    times.forEach(time => {
+      const [ hour, minute ] = time.t.split(':');
+      const m = moment({hour, minute}).day(i);
+      if (m.isAfter(now)) {
+        setupAlarm(m);
+      }
+    });
+  }
+}
+
+const searchNextAlarm = () => {
+
+}

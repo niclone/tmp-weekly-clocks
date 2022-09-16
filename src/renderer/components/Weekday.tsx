@@ -14,6 +14,7 @@ interface WeekdayProps {
 interface AlarmTime {
   id: string;
   t: string;
+  day: number;
 }
 
 const useElectronStore = <T,>(
@@ -36,10 +37,10 @@ const useElectronStore = <T,>(
 
 const Weekday = (props: WeekdayProps) => {
   const { day, dayname } = props;
-  const [times, setTimes] = useElectronStore<AlarmTime[]>(`times-${day}`, []);
+  const [times, setTimes] = useElectronStore<AlarmTime[]>(`times`, []);
   const addTime = () => {
     const id = uuid();
-    setTimes([...times, { id, t: '00:00' } as AlarmTime]);
+    setTimes([...times, { id, t: '00:00', day } as AlarmTime]);
   };
 
   const removeTime = (id: string) => {
@@ -50,17 +51,19 @@ const Weekday = (props: WeekdayProps) => {
     <div className="Weekday">
       <div className="WeekDayName">{dayname}</div>
       <div className="WeekDayAlarms">
-        {times.map((at: AlarmTime) => (
-          <Chip key={`chip-${at.id}`} onClose={() => removeTime(at.id)}>
-            <TimeSelector
-              onChange={(newtime: string) => {
-                at.t = newtime;
-                setTimes(times);
-              }}
-              timestr={at.t}
-            />
-          </Chip>
-        ))}
+        {times
+          .filter((at: AlarmTime) => at.day === day)
+          .map((at: AlarmTime) => (
+            <Chip key={`chip-${at.id}`} onClose={() => removeTime(at.id)}>
+              <TimeSelector
+                onChange={(newtime: string) => {
+                  at.t = newtime;
+                  setTimes(times);
+                }}
+                timestr={at.t}
+              />
+            </Chip>
+          ))}
         <Button onClick={() => addTime()}>+</Button>
       </div>
     </div>
