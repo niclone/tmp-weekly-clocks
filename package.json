@@ -234,7 +234,8 @@
       "target": [
         "AppImage"
       ],
-      "category": "Utility"
+      "category": "Utility",
+      "icon": "./assets/icon-256x256.png"
     },
     "directories": {
       "app": "release/app",
