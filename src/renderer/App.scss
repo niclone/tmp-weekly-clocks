@@ -1,0 +1,81 @@
+// Custom.scss
+// Option A: Include all of Bootstrap
+
+// Your variable overrides
+$body-bg: #000;
+$body-color: #000;
+
+$theme-colors: (
+  "primary": #996666,
+  "danger": #ff4136
+);
+
+@import "node_modules/bootstrap/scss/bootstrap";
+
+body {
+  position: relative;
+  height: 100vh;
+  background: linear-gradient(
+    200.96deg,
+    #dbb,
+    #a75 51.77%,
+    #a77 129.35%
+  );
+  //font-family: sans-serif;
+  overflow-y: hidden;
+  display: flex;
+  //justify-content: center;
+  align-items: center;
+}
+
+li {
+  list-style: none;
+}
+
+a {
+  text-decoration: none;
+  height: fit-content;
+  width: fit-content;
+  margin: 10px;
+}
+
+a:hover {
+  opacity: 1;
+  text-decoration: none;
+}
+
+.Weekday {
+  padding: 0.5em;
+}
+
+.WeekDayAlarms {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.Chips {
+  display: flex;
+  align-items: center;
+  background: #744;
+  padding: 0.1em 5px;
+  border-radius: 10px;
+  margin: 0.2em 8px;
+}
+
+.Chips input {
+  background-color: #966;
+  border: none;
+}
+
+.ChipClose {
+  background-color: #966;
+  padding: 0px;
+  width: 1.5em;
+  height: 1.5em;
+  margin: 4px;
+  cursor: pointer;
+}
+
+.ChipClose:hover {
+  background-color: #b88;
+}
