@@ -284,6 +284,10 @@ const menuStopAlarm = (menuItem: Electron.MenuItem, browserWindow: Electron.Brow
   }
 };
 
+const menuQuit = (menuItem: Electron.MenuItem, browserWindow: Electron.BrowserWindow, event: Electron.KeyboardEvent) => {
+  app.quit();
+};
+
 const menuChooseAudioFile = (menuItem: Electron.MenuItem, browserWindow: Electron.BrowserWindow, event: Electron.KeyboardEvent) => {
   const { dialog } = require('electron')
   dialog.showOpenDialog({ properties: ['openFile'] }).then(f => {
@@ -319,6 +323,7 @@ app
       { label: 'Edit Alarms...', click: menuEditAlarm },
       { label: 'Stop Playing', /*enabled: false,*/ id: 'stopPlay' },
       { label: 'Choose audio file...', click: menuChooseAudioFile },
+      { label: 'Kill me ! (Quit)', click: menuQuit },
     ]);
     tray.setContextMenu(contextMenu);
     tray.setToolTip('Ceci est mon application');
