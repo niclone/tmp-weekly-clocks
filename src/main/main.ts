@@ -9,13 +9,13 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, Notification, Tray, Menu, nativeImage } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import Store from 'electron-store';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
-import moment from 'moment';
+//import tray from './tray';
 
 class AppUpdater {
   constructor() {
@@ -141,7 +141,7 @@ app
 
 /*
  * Code nico
-**/
+ **/
 
 const store = new Store({ name: 'horloge-de-classe' });
 
@@ -152,7 +152,8 @@ ipcMain.on('electron-store-get', async (event, val) => {
 ipcMain.on('electron-store-set', async (event, key, val) => {
   store.set(key, val);
   event.returnValue = store.get(val);
-  getAlarms();
+  setupAlarms();
+  new Notification({ title: "saved", body: "le truc à bien été sauvé, alors fait pas iech" }).show();
 });
 
 // search next alarm
@@ -170,44 +171,100 @@ interface Croned {
   task: object;
 }
 
-const croneds = {};
-
 const musica = () => {
   console.log('musica !');
+  //showNotification();
+  new Notification({ title: "fuck", body: "c'est l'heure !" }).show();
+
 };
 
-const setupAlarm = (at: AlarmTime) => {
-  const [ hour, minute ] = at.t.split(':');
-  const task = croneds[at.id];
-  if (task !== undefined) {
-    if (JSON.stringify(at) !== JSON.stringify(task.options.at)) {
-      task.stop();
-    }
-  } else {
-    croneds[at.id] = cron.schedule(`${minute} ${hour} * * ${at.day}`, () => {
-      musica();
-    }, {
-      at
-    });
-  }
-}
+const setupAlarms = () => {
+  const savedstr = store.get('times');
+  let saved;
+  if (savedstr === undefined) saved = new Map();
+  else saved = JSON.parse(savedstr);
 
-const getAlarms = () => {
-  const now = moment();
-  for (let i = 0; i < 7; i++) {
-    const timesstr = store.get(`times-${i}`);
-    if (timesstr === undefined) continue;
-    let times = JSON.parse(timesstr);
-    times.forEach(time => {
-      const [ hour, minute ] = time.t.split(':');
-      const m = moment({hour, minute}).day(i);
-      if (m.isAfter(now)) {
-        setupAlarm(m);
+  if (typeof(saved) !== 'object') {
+    saved = {};
+    store.set('times', {});
+  }
+
+  console.log(" =============== setupAlarms ============== ", saved.length);
+
+  const addCron = (at: AlarmTime) => {
+    const [hour, minute] = at.t.split(':');
+    cron.schedule(
+      `${minute} ${hour} * * ${at.day}`,
+      () => {
+        musica();
+      },
+      {
+        name: at.id,
+        at,
       }
-    });
-  }
-}
+    );
+  };
 
-const searchNextAlarm = () => {
+  // check existing tasks
+  const tasks = cron.getTasks();
+  tasks.forEach((task: any) => {
+    const id = task.options.name;
+    const savedat = saved[id];
+    console.log("check task : ", id, savedat !== undefined ? 'yes' : 'no');
+    if (savedat === undefined) {
+      // remove this active task that doest not exists anymore
+      task.stop();
+      tasks.delete(id);
+      console.log("   - deleted : ", id, tasks.get(id) === undefined, cron.getTasks().get(id) === undefined);
+    } else if (JSON.stringify(savedat) !== JSON.stringify(task.options.at)) {
+      // update changed task
+      task.stop();
+      tasks.delete(id);
+      addCron(savedat);
+      console.log("   - modified : ", id);
+    }
+  });
 
-}
+  // check for new tasks
+  Object.values(saved).forEach((at: AlarmTime) => {
+    if (tasks.get(at.id) === undefined) {
+      addCron(at);
+      console.log("   - created : ", at.id, tasks.get(at.id) === undefined, cron.getTasks().get(at.id) === undefined);
+    }
+  });
+
+  console.log("saved: ", saved);
+  console.log("tasks: ", cron.getTasks().keys());
+};
+
+
+//const { app, Tray, Menu, nativeImage } = require('electron');
+
+let tray;
+app
+  .whenReady()
+  .then(() => {
+    const icon = nativeImage.createFromPath('assets/alarm-clock.png');
+    console.log("icon: ", icon.getSize());
+    //tray = new Tray('⏰');
+    tray = new Tray(icon);
+
+    // note: votre code contextMenu, Tooltip and Title ira ici!
+    const contextMenu = Menu.buildFromTemplate([
+      { label: 'Item1', type: 'radio' },
+      { label: 'Item2', type: 'radio' },
+      { label: 'Item3', type: 'radio', checked: true },
+      { label: 'Item4', type: 'radio' },
+    ]);
+    tray.setContextMenu(contextMenu);
+    tray.setToolTip('Ceci est mon application');
+    tray.setTitle('Ceci est mon titre');
+    //return null;
+  })
+  .catch((e) => {
+    console.error("TRAY ERROOOOOOOOOOOOOOR", e);
+  });
+
+
+setupAlarms();
+//tray();

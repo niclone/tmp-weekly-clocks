@@ -37,21 +37,27 @@ const useElectronStore = <T,>(
 
 const Weekday = (props: WeekdayProps) => {
   const { day, dayname } = props;
-  const [times, setTimes] = useElectronStore<AlarmTime[]>(`times`, []);
+  const [times, setTimes] = useElectronStore(`times`, {});
+  if (typeof(times) !== 'object') {
+    setTimes({});
+    return <div>plof</div>;
+  }
   const addTime = () => {
     const id = uuid();
-    setTimes([...times, { id, t: '00:00', day } as AlarmTime]);
+    times[id] = { id, t: '00:00', day };
+    setTimes(times);
   };
 
   const removeTime = (id: string) => {
-    setTimes([...times.filter((o) => o.id !== id)]);
+    delete times[id];
+    setTimes(times);
   };
 
   return (
     <div className="Weekday">
       <div className="WeekDayName">{dayname}</div>
       <div className="WeekDayAlarms">
-        {times
+        {Object.values(times)
           .filter((at: AlarmTime) => at.day === day)
           .map((at: AlarmTime) => (
             <Chip key={`chip-${at.id}`} onClose={() => removeTime(at.id)}>
