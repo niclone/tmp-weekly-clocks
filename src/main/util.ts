@@ -11,3 +11,10 @@ export function resolveHtmlPath(htmlFileName: string) {
   }
   return `file://${path.resolve(__dirname, '../renderer/', htmlFileName)}`;
 }
+
+export function resolveAssetsPath(assetFileName: string) {
+  if (process.env.NODE_ENV === 'development') {
+    return path.join(__dirname, '../../assets', assetFileName);
+  }
+  return path.join(__dirname, '../../../assets', assetFileName);
+}

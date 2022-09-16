@@ -25,8 +25,7 @@
     "email": "nicolas@sengena.com",
     "url": "https://www.sengena.com/"
   },
-  "contributors": [
-  ],
+  "contributors": [],
   "main": "./src/main/main.ts",
   "scripts": {
     "build": "concurrently \"npm run build:main\" \"npm run build:renderer\"",
@@ -110,6 +109,7 @@
     "electron-updater": "^5.2.2",
     "moment": "^2.29.4",
     "node-cron": "^3.0.2",
+    "play-sound": "^1.1.5",
     "react": "^18.2.0",
     "react-bootstrap": "^2.5.0",
     "react-dom": "^18.2.0",
@@ -193,7 +193,8 @@
     "files": [
       "dist",
       "node_modules",
-      "package.json"
+      "package.json",
+      "assets/alarm-clock.png"
     ],
     "afterSign": ".erb/scripts/notarize.js",
     "mac": {

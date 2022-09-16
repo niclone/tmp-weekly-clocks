@@ -14,7 +14,7 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import Store from 'electron-store';
 import MenuBuilder from './menu';
-import { resolveHtmlPath } from './util';
+import { resolveHtmlPath, resolveAssetsPath } from './util';
 //import tray from './tray';
 
 class AppUpdater {
@@ -98,6 +98,7 @@ const createWindow = async () => {
   });
 
   mainWindow.on('closed', () => {
+    console.log("window closed !");
     mainWindow = null;
   });
 
@@ -112,13 +113,13 @@ const createWindow = async () => {
 
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
-  new AppUpdater();
+  //new AppUpdater();
 };
 
 /**
  * Add event listeners...
  */
-
+/*
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed
@@ -126,7 +127,10 @@ app.on('window-all-closed', () => {
     app.quit();
   }
 });
+*/
+app.on('window-all-closed', e => e.preventDefault() );
 
+/*
 app
   .whenReady()
   .then(() => {
@@ -138,6 +142,7 @@ app
     });
   })
   .catch(console.log);
+*/
 
 /*
  * Code nico
@@ -153,7 +158,7 @@ ipcMain.on('electron-store-set', async (event, key, val) => {
   store.set(key, val);
   event.returnValue = store.get(val);
   setupAlarms();
-  new Notification({ title: "saved", body: "le truc à bien été sauvé, alors fait pas iech" }).show();
+  //new Notification({ title: "saved", body: "le truc à bien été sauvé, alors fait pas iech" }).show();
 });
 
 // search next alarm
@@ -171,15 +176,26 @@ interface Croned {
   task: object;
 }
 
+const player = require('play-sound')({});
+let playingMusica: unknown = null;
+let contextMenu: Electron.Menu;
 const musica = () => {
   console.log('musica !');
   //showNotification();
-  new Notification({ title: "fuck", body: "c'est l'heure !" }).show();
+  //new Notification({ title: "fuck", body: "c'est l'heure !" }).show();
+  if (playingMusica !== null) return;
+  //contextMenu.getMenuItemById("stopPlay").enabled=true;
+  playingMusica = player.play(store.get("audiofile"), {}, err => {
+    //contextMenu.getMenuItemById("stopPlay").enabled=false;
+    console.log("play err: ", err);
+    playingMusica = null;
+  });
 
 };
 
 const setupAlarms = () => {
   const savedstr = store.get('times');
+  const enabled = store.get('enabled');
   let saved;
   if (savedstr === undefined) saved = new Map();
   else saved = JSON.parse(savedstr);
@@ -210,8 +226,8 @@ const setupAlarms = () => {
   tasks.forEach((task: any) => {
     const id = task.options.name;
     const savedat = saved[id];
-    console.log("check task : ", id, savedat !== undefined ? 'yes' : 'no');
-    if (savedat === undefined) {
+    //console.log("check task : ", id, savedat !== undefined ? 'yes' : 'no');
+    if (!enabled || savedat === undefined) {
       // remove this active task that doest not exists anymore
       task.stop();
       tasks.delete(id);
@@ -226,12 +242,14 @@ const setupAlarms = () => {
   });
 
   // check for new tasks
-  Object.values(saved).forEach((at: AlarmTime) => {
-    if (tasks.get(at.id) === undefined) {
-      addCron(at);
-      console.log("   - created : ", at.id, tasks.get(at.id) === undefined, cron.getTasks().get(at.id) === undefined);
-    }
-  });
+  if (enabled) {
+    Object.values(saved).forEach((at: AlarmTime) => {
+      if (tasks.get(at.id) === undefined) {
+        addCron(at);
+        console.log("   - created : ", at.id, tasks.get(at.id) === undefined, cron.getTasks().get(at.id) === undefined);
+      }
+    });
+  }
 
   console.log("saved: ", saved);
   console.log("tasks: ", cron.getTasks().keys());
@@ -240,21 +258,60 @@ const setupAlarms = () => {
 
 //const { app, Tray, Menu, nativeImage } = require('electron');
 
+const menuSetEnabled = (menuItem: Electron.MenuItem, browserWindow: Electron.BrowserWindow, event: Electron.KeyboardEvent) => {
+  store.set("enabled", menuItem.checked);
+  setupAlarms();
+};
+
+const menuEditAlarm = (menuItem: Electron.MenuItem, browserWindow: Electron.BrowserWindow, event: Electron.KeyboardEvent) => {
+  if (mainWindow === null) createWindow();
+  else mainWindow.focus();
+};
+
+const menuStopAlarm = (menuItem: Electron.MenuItem, browserWindow: Electron.BrowserWindow, event: Electron.KeyboardEvent) => {
+  if (playingMusica !== null) {
+    playingMusica.kill();
+    playingMusica=null;
+  }
+};
+
+const menuChooseAudioFile = (menuItem: Electron.MenuItem, browserWindow: Electron.BrowserWindow, event: Electron.KeyboardEvent) => {
+  const { dialog } = require('electron')
+  dialog.showOpenDialog({ properties: ['openFile'] }).then(f => {
+    if (!f.canceled && f.filePaths.length === 1) {
+      store.set("audiofile", f.filePaths[0]);
+
+      if (playingMusica !== null) playingMusica.kill();
+      //contextMenu.getMenuItemById("stopPlay").enabled=true;
+      playingMusica = player.play(store.get("audiofile"), {}, err => {
+        //contextMenu.getMenuItemById("stopPlay").enabled=false;
+        console.log("play err: ", err);
+        playingMusica = null;
+      });
+
+    }
+  }).catch(err => {
+    console.error("err: ", err);
+  })
+};
+
+
 let tray;
 app
   .whenReady()
   .then(() => {
-    const icon = nativeImage.createFromPath('assets/alarm-clock.png');
+    const icon = nativeImage.createFromPath(resolveAssetsPath('alarm-clock.png'));
+    //const icon = nativeImage.createFromBuffer(iconTray);
     console.log("icon: ", icon.getSize());
     //tray = new Tray('⏰');
     tray = new Tray(icon);
 
     // note: votre code contextMenu, Tooltip and Title ira ici!
-    const contextMenu = Menu.buildFromTemplate([
-      { label: 'Item1', type: 'radio' },
-      { label: 'Item2', type: 'radio' },
-      { label: 'Item3', type: 'radio', checked: true },
-      { label: 'Item4', type: 'radio' },
+    contextMenu = Menu.buildFromTemplate([
+      { label: 'Enabled', type: 'checkbox', checked: !!store.get('enabled'), click: menuSetEnabled },
+      { label: 'Edit Alarms...', click: menuEditAlarm },
+      { label: 'Stop Playing', /*enabled: false,*/ id: 'stopPlay' },
+      { label: 'Choose audio file...', click: menuChooseAudioFile },
     ]);
     tray.setContextMenu(contextMenu);
     tray.setToolTip('Ceci est mon application');
@@ -268,3 +325,15 @@ app
 
 setupAlarms();
 //tray();
+
+
+/*
+//const testFolder = path.join(__dirname, '../../../assets');
+const testFolder = path.join(__dirname, '../../assets');
+const fs = require('fs');
+
+console.log("ls ", testFolder);
+fs.readdirSync(testFolder).forEach(file => {
+  console.log(file);
+});
+*/
