@@ -75,7 +75,9 @@ const createWindow = async () => {
     show: false,
     width: 1024,
     height: 728,
-    icon: getAssetPath('icon.png'),
+    icon: getAssetPath('alarm-clock.png'),
+    title: 'Horloge de Classe',
+
     webPreferences: {
       sandbox: false,
       preload: app.isPackaged
@@ -84,6 +86,8 @@ const createWindow = async () => {
     },
   });
 
+  mainWindow.setMenuBarVisibility(false);
+  mainWindow.setTitle('Horloge de Classe');
   mainWindow.loadURL(resolveHtmlPath('index.html'));
 
   mainWindow.on('ready-to-show', () => {
@@ -257,10 +261,15 @@ const setupAlarms = () => {
 
 
 //const { app, Tray, Menu, nativeImage } = require('electron');
+let tray;
+const icon_enabled = nativeImage.createFromPath(resolveAssetsPath('alarm-clock.png'));
+const icon_disabled = nativeImage.createFromPath(resolveAssetsPath('alarm-clock-disabled.png'));
 
 const menuSetEnabled = (menuItem: Electron.MenuItem, browserWindow: Electron.BrowserWindow, event: Electron.KeyboardEvent) => {
   store.set("enabled", menuItem.checked);
   setupAlarms();
+const icon_enabled = nativeImage.createFromPath(resolveAssetsPath('alarm-clock.png'));
+  tray.setImage(menuItem.checked ? icon_enabled : icon_disabled);
 };
 
 const menuEditAlarm = (menuItem: Electron.MenuItem, browserWindow: Electron.BrowserWindow, event: Electron.KeyboardEvent) => {
@@ -296,15 +305,13 @@ const menuChooseAudioFile = (menuItem: Electron.MenuItem, browserWindow: Electro
 };
 
 
-let tray;
 app
   .whenReady()
   .then(() => {
-    const icon = nativeImage.createFromPath(resolveAssetsPath('alarm-clock.png'));
     //const icon = nativeImage.createFromBuffer(iconTray);
-    console.log("icon: ", icon.getSize());
+    //console.log("icon: ", icon.getSize());
     //tray = new Tray('⏰');
-    tray = new Tray(icon);
+    tray = new Tray((!!store.get('enabled')) ? icon_enabled : icon_disabled);
 
     // note: votre code contextMenu, Tooltip and Title ira ici!
     contextMenu = Menu.buildFromTemplate([

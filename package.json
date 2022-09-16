@@ -234,7 +234,7 @@
       "target": [
         "AppImage"
       ],
-      "category": "Development"
+      "category": "Utility"
     },
     "directories": {
       "app": "release/app",
@@ -246,8 +246,8 @@
     ],
     "publish": {
       "provider": "github",
-      "owner": "electron-react-boilerplate",
-      "repo": "electron-react-boilerplate"
+      "owner": "horloge-de-classe",
+      "repo": "horloge-de-classe"
     }
   },
   "collective": {

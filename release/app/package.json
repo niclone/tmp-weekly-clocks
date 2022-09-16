@@ -1,12 +1,12 @@
 {
-  "name": "electron-react-boilerplate",
-  "version": "4.6.0",
-  "description": "A foundation for scalable desktop apps",
+  "name": "horloge-de-classe",
+  "version": "1.0.0",
+  "description": "Horloge de Classe, A multiple alarms for school teacher",
   "license": "MIT",
   "author": {
-    "name": "Electron React Boilerplate Maintainers",
-    "email": "electronreactboilerplate@gmail.com",
-    "url": "https://github.com/electron-react-boilerplate"
+    "name": "Nicolas Dimitrijevic",
+    "email": "nicolas@sengena.com",
+    "url": "https://sengena.com"
   },
   "main": "./dist/main/main.js",
   "scripts": {
