@@ -1,7 +1,7 @@
 {
-  "name": "horloge-de-classe",
+  "name": "weekly-clocks",
   "version": "1.0.0",
-  "description": "Horloge de Classe, A multiple alarms for school teacher",
+  "description": "Weekly Clocks, A multiple alarms for school teacher",
   "license": "MIT",
   "author": {
     "name": "Nicolas Dimitrijevic",

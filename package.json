@@ -187,7 +187,7 @@
   },
   "build": {
     "productName": "HorlogeDeClasse",
-    "appId": "com.sengena.horloge-de-classe",
+    "appId": "com.sengena.weekly-clocks",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
@@ -232,10 +232,11 @@
     },
     "linux": {
       "target": [
-        "AppImage"
+        "snap"
       ],
       "category": "Utility",
-      "icon": "./assets/icon-256x256.png"
+      "icon": "./assets/icon-256x256.png",
+      "desktop": false
     },
     "directories": {
       "app": "release/app",
@@ -247,8 +248,8 @@
     ],
     "publish": {
       "provider": "github",
-      "owner": "horloge-de-classe",
-      "repo": "horloge-de-classe"
+      "owner": "weekly-clocks",
+      "repo": "weekly-clocks"
     }
   },
   "collective": {

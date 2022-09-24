@@ -76,7 +76,7 @@ const createWindow = async () => {
     width: 720,
     height: 560,
     icon: getAssetPath('alarm-clock.png'),
-    title: 'Horloge de Classe',
+    title: 'Weekly Clocks',
 
     webPreferences: {
       sandbox: false,
@@ -87,7 +87,7 @@ const createWindow = async () => {
   });
 
   mainWindow.setMenuBarVisibility(false);
-  mainWindow.setTitle('Horloge de Classe');
+  mainWindow.setTitle('Weekly Clocks');
   mainWindow.loadURL(resolveHtmlPath('index.html'));
 
   mainWindow.on('ready-to-show', () => {
@@ -152,7 +152,7 @@ app
  * Code nico
  **/
 
-const store = new Store({ name: 'horloge-de-classe' });
+const store = new Store({ name: 'weekly-clocks' });
 
 // IPC listener
 ipcMain.on('electron-store-get', async (event, val) => {
