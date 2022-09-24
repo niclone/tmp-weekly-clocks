@@ -5,10 +5,13 @@
 $body-bg: #000;
 $body-color: #000;
 
+/*
 $theme-colors: (
   "primary": #996666,
   "danger": #ff4136
 );
+*/
+$primary: #333333;
 
 @import "node_modules/bootstrap/scss/bootstrap";
 

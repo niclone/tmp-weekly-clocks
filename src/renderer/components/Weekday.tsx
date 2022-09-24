@@ -1,47 +1,18 @@
-import { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import uuid from 'react-uuid';
 import Chip from './Chip';
 import TimeSelector from './TimeSelector';
 
-const { store } = window.electron;
-
 interface WeekdayProps {
   day: number;
   dayname: string;
+  times: object;
+  setTimes: (o: object) => void;
 }
-
-interface AlarmTime {
-  id: string;
-  t: string;
-  day: number;
-}
-
-const useElectronStore = <T,>(
-  key: string,
-  initialValue: T
-): [T, (v: T) => void] => {
-  const v = store.get(key);
-  const [data, setData] = useState<T>(
-    v === undefined ? initialValue : JSON.parse(v)
-  );
-
-  const setElectronValue = (value: T) => {
-    const newvalstr = JSON.stringify(value);
-    store.set(key, newvalstr);
-    setData(JSON.parse(newvalstr));
-  };
-
-  return [data, setElectronValue];
-};
 
 const Weekday = (props: WeekdayProps) => {
-  const { day, dayname } = props;
-  const [times, setTimes] = useElectronStore(`times`, {});
-  if (typeof(times) !== 'object') {
-    setTimes({});
-    return <div>plof</div>;
-  }
+  const { day, dayname, times, setTimes } = props;
+
   const addTime = () => {
     const id = uuid();
     times[id] = { id, t: '00:00', day };

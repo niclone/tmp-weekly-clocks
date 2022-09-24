@@ -73,8 +73,8 @@ const createWindow = async () => {
 
   mainWindow = new BrowserWindow({
     show: false,
-    width: 1024,
-    height: 728,
+    width: 720,
+    height: 560,
     icon: getAssetPath('alarm-clock.png'),
     title: 'Horloge de Classe',
 
@@ -181,18 +181,18 @@ interface Croned {
 }
 
 const player = require('play-sound')({});
-let playingMusica: unknown = null;
+let playingMusica: unknown = undefined;
 let contextMenu: Electron.Menu;
 const musica = () => {
   console.log('musica !');
   //showNotification();
   //new Notification({ title: "fuck", body: "c'est l'heure !" }).show();
-  if (playingMusica !== null) return;
+  if (playingMusica) return;
   //contextMenu.getMenuItemById("stopPlay").enabled=true;
   playingMusica = player.play(store.get("audiofile"), {}, err => {
     //contextMenu.getMenuItemById("stopPlay").enabled=false;
     console.log("play err: ", err);
-    playingMusica = null;
+    playingMusica = undefined;
   });
 
 };
@@ -210,6 +210,7 @@ const setupAlarms = () => {
   }
 
   console.log(" =============== setupAlarms ============== ", saved.length);
+  console.log("saved: ", saved);
 
   const addCron = (at: AlarmTime) => {
     const [hour, minute] = at.t.split(':');
@@ -255,7 +256,6 @@ const setupAlarms = () => {
     });
   }
 
-  console.log("saved: ", saved);
   console.log("tasks: ", cron.getTasks().keys());
 };
 
@@ -278,9 +278,9 @@ const menuEditAlarm = (menuItem: Electron.MenuItem, browserWindow: Electron.Brow
 };
 
 const menuStopAlarm = (menuItem: Electron.MenuItem, browserWindow: Electron.BrowserWindow, event: Electron.KeyboardEvent) => {
-  if (playingMusica !== null) {
+  if (playingMusica) {
     playingMusica.kill();
-    playingMusica=null;
+    playingMusica = undefined;
   }
 };
 
@@ -294,12 +294,12 @@ const menuChooseAudioFile = (menuItem: Electron.MenuItem, browserWindow: Electro
     if (!f.canceled && f.filePaths.length === 1) {
       store.set("audiofile", f.filePaths[0]);
 
-      if (playingMusica !== null) playingMusica.kill();
+      if (playingMusica) playingMusica.kill();
       //contextMenu.getMenuItemById("stopPlay").enabled=true;
       playingMusica = player.play(store.get("audiofile"), {}, err => {
         //contextMenu.getMenuItemById("stopPlay").enabled=false;
         console.log("play err: ", err);
-        playingMusica = null;
+        playingMusica = undefined;
       });
 
     }
@@ -321,7 +321,7 @@ app
     contextMenu = Menu.buildFromTemplate([
       { label: 'Enabled', type: 'checkbox', checked: !!store.get('enabled'), click: menuSetEnabled },
       { label: 'Edit Alarms...', click: menuEditAlarm },
-      { label: 'Stop Playing', /*enabled: false,*/ id: 'stopPlay' },
+      { label: 'Stop Playing', /*enabled: false,*/ id: 'stopPlay', click: menuStopAlarm },
       { label: 'Choose audio file...', click: menuChooseAudioFile },
       { label: 'Kill me ! (Quit)', click: menuQuit },
     ]);
