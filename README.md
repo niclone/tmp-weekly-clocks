@@ -1,6 +1,7 @@
 # Weekly Clocks
 
 This project is a simple alarm clock that let you set multiple alarm at different time per dey of a week. An audio file that you have to choose will be played.
+It is primarily intended for Linux desktops.
 
 ## Starting Development
 
